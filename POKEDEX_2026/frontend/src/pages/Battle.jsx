@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const socketUrl = `http://${window.location.hostname}:3001`;
 
@@ -298,6 +299,54 @@ function Batalla() {
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {estadoJuego.status === 'finished' && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ type: 'spring', damping: 15 }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.85)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}
+          >
+            <motion.h1
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              transition={{ delay: 0.2, type: 'spring', damping: 10 }}
+              style={{
+                fontSize: '6rem',
+                color: yo.team.some(p => p.vida_actual > 0) ? '#32a852' : '#e3350d',
+                textShadow: '0 0 30px rgba(255,255,255,0.3)',
+                margin: '0 0 3rem 0',
+                fontFamily: 'Outfit, sans-serif',
+                textAlign: 'center'
+              }}
+            >
+              {yo.team.some(p => p.vida_actual > 0) ? '¡HAS GANADO!' : '¡HAS PERDIDO!'}
+            </motion.h1>
+            
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="btn btn-accent"
+              onClick={() => navigate('/lobby')}
+              style={{ fontSize: '1.5rem', padding: '1rem 3rem' }}
+            >
+              Volver al Lobby
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

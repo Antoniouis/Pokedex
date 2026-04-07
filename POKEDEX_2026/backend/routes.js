@@ -32,7 +32,7 @@ router.get('/pokemon/:id', async (req, res) => {
 router.get('/team', async (req, res) => {
   try {
     const [teams] = await pool.query('SELECT * FROM team');
-    
+
     // Fetch pokemons for each team
     for (let team of teams) {
       const [pokemons] = await pool.query(`
@@ -42,7 +42,7 @@ router.get('/team', async (req, res) => {
       `, [team.id]);
       team.pokemons = pokemons;
     }
-    
+
     res.json(teams);
   } catch (error) {
     console.error(error);
@@ -79,6 +79,29 @@ router.post('/team', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   } finally {
     if (connection) connection.release();
+  }
+});
+
+// POST /capturar - Intento de captura de un Pokémon
+router.post('/capturar', async (req, res) => {
+  const { pokemon_id } = req.body;
+  if (!pokemon_id) return res.status(400).json({ error: 'pokemon_id es requerido' });
+
+  // Tal y como pediste estableciendo 'success = true' en el Lobby:
+  // Hacemos que el backend SIEMPRE acepte la captura (100%)
+  const isCaught = true;
+
+  if (isCaught) {
+    try {
+      await pool.query('INSERT INTO capturas (pokemon_id) VALUES (?)', [pokemon_id]);
+      res.json({ success: true, message: '¡Pokémon capturado exitosamente!' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error del servidor al guardar.' });
+    }
+  } else {
+    // Escapó, no hacemos INSERT
+    res.json({ success: false, message: '¡El Pokémon se escapó!' });
   }
 });
 

@@ -4,9 +4,9 @@ const pool = require('./config/db');
 async function seed() {
   try {
     console.log('Starting seed process...');
-    
-    // Fetch first 151 Pokemon
-    const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
+
+    // Fetch more Pokemon (limit 1000)
+    const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=1000');
     const pokemonList = response.data.results;
 
     console.log(`Fetched ${pokemonList.length} pokemon from PokeAPI. Fetching details...`);
@@ -21,7 +21,7 @@ async function seed() {
       const altura = data.height;
       const peso = data.weight;
       const imagen = data.sprites.other['official-artwork'].front_default || data.sprites.front_default;
-      
+
       const stats = {};
       data.stats.forEach(s => {
         stats[s.stat.name] = s.base_stat;
@@ -30,14 +30,17 @@ async function seed() {
       const ataque = stats['attack'] || 50;
       const defensa = stats['defense'] || 50;
       const vida = stats['hp'] || 50;
+      const sp_ataque = stats['special-attack'] || 50;
+      const sp_defensa = stats['special-defense'] || 50;
+      const velocidad = stats['speed'] || 50;
 
       // Insert or ignore
       await pool.query(
-        `INSERT IGNORE INTO pokemon (id, nombre, tipo, altura, peso, imagen, ataque, defensa, vida) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, nombre, tipo, altura, peso, imagen, ataque, defensa, vida]
+        `INSERT IGNORE INTO pokemon (id, nombre, tipo, altura, peso, imagen, ataque, defensa, vida, sp_ataque, sp_defensa, velocidad) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, nombre, tipo, altura, peso, imagen, ataque, defensa, vida, sp_ataque, sp_defensa, velocidad]
       );
-      
+
       console.log(`Inserted ${nombre} (#${id})`);
     }
 

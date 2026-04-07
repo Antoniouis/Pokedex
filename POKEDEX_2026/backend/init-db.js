@@ -20,6 +20,7 @@ async function initDB() {
     // Drop tables if they exist to start fresh
     await connection.query('DROP TABLE IF EXISTS team_pokemon');
     await connection.query('DROP TABLE IF EXISTS team');
+    await connection.query('DROP TABLE IF EXISTS capturas');
     await connection.query('DROP TABLE IF EXISTS pokemon');
 
     // Create tables
@@ -33,7 +34,10 @@ async function initDB() {
         imagen VARCHAR(255),
         ataque INT,
         defensa INT,
-        vida INT
+        vida INT,
+        sp_ataque INT,
+        sp_defensa INT,
+        velocidad INT
       )
     `);
     console.log('Table "pokemon" ready.');
@@ -56,6 +60,16 @@ async function initDB() {
       )
     `);
     console.log('Table "team_pokemon" ready.');
+
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS capturas (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        pokemon_id INT,
+        fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (pokemon_id) REFERENCES pokemon(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('Table "capturas" ready.');
 
   } catch (err) {
     console.error('Error initializing database:', err);
